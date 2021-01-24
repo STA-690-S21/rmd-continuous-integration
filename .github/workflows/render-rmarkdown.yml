@@ -9,7 +9,7 @@ jobs:
   render:
     name: Render Rmarkdown files
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 20
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
