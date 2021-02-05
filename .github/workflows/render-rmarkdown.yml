@@ -10,12 +10,10 @@ jobs:
     name: Render Rmarkdown files
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 2 # This is important to set for `git diff-tree` to work below
+          fetch-depth: 0
       - name: Install Curl
         run: sudo apt install libcurl4-openssl-dev libssl-dev
       - name: Install libgit2
@@ -36,6 +34,5 @@ jobs:
         shell: Rscript {0}
       - name: Render Rmarkdown files
         run: |
-          RMD_PATH=($(git diff-tree --no-commit-id --name-only -r HEAD | grep '[.]Rmd$'))
-          Rscript -e 'for (file in commandArgs(TRUE)) rmarkdown::render(file)' ${RMD_PATH[*]}
-          
+          RMD_PATH=($(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '[.]Rmd$'))
+          Rscript -e 'files=commandArgs(TRUE); files=files[file.exists(files)]; cat("Attempting to render the following files: ", files, "\n"); for (f in files) rmarkdown::render(f)' ${RMD_PATH[*]}
